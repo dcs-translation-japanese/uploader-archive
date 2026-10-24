@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="旧 DCS World 日本語化ファイルアップローダーの保存ファイルを検索・ダウンロードできます。">
+  <title>DCS World 日本語化ファイルアーカイブ</title>
+  <style>
+    :root { color-scheme: light; --ink: #20252b; --muted: #505963; --line: #c4cad0; --surface: #e7ebef; --link: #1456a0; --paper: #f0f2f4; }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: var(--paper); font: 1rem/1.2 system-ui, -apple-system, "Segoe UI", "Noto Sans JP", sans-serif; }
+    main { display: grid; gap: 32px; max-width: 1320px; margin: 0 auto; padding: 32px 24px 48px; }
+    body > footer { --link: #a8cfff; padding: 24px 24px 32px; color: #f4f6f8; background: #20252b; font-size: .875rem; line-height: 1.5; }
+    body > footer .document { max-width: 1272px; margin: 0 auto; padding: 0; border: 0; }
+    body > footer .prose { gap: 6px; }
+    body > footer nav { gap: 4px 16px; }
+    h1 { font-size: clamp(1.2rem, 2.6vw, 1.6rem); line-height: 1.5; margin: 0; }
+    h2 { font-size: clamp(1.15rem, 2.3vw, 1.4rem); font-weight: 700; margin: 0 0 16px; }
+    h3 { font-size: 1rem; font-weight: 600; margin: 8px 0; }
+    p { margin: 0 0 8px; }
+    a { color: var(--link); text-underline-offset: .2em; overflow-wrap: anywhere; }
+    a:hover { text-decoration-thickness: 2px; }
+    :focus-visible { outline: 3px solid var(--link); outline-offset: 3px; }
+    header { display: grid; gap: 8px; }
+    header p { margin: 0; font-size: .9rem; }
+    nav { font-size: .9rem; }
+    nav { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+    .muted, .hint { color: var(--muted); }
+    .hint { font-size: .875rem; margin-top: 6px; }
+    .toolbar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; padding: 12px; background: var(--surface); border: 1px solid var(--line); }
+    .toolbar .hint { margin-bottom: 0; }
+    label { font-size: .9rem; }
+    label { display: block; font-weight: 600; margin-bottom: 6px; }
+    input, select, button { font: inherit; color: inherit; background: var(--paper); border: 1px solid #78828c; border-radius: 3px; min-height: 44px; padding: 8px 12px; }
+    input { width: 100%; min-width: 0; }
+    button, summary, select { cursor: pointer; }
+    button:hover { background: var(--surface); }
+    button:disabled { cursor: default; opacity: .6; }
+    .search-row { display: flex; gap: 8px; }
+    .search-row button { flex-shrink: 0; }
+    .result-bar { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; margin: 8px 0; }
+    #status { margin: 0; font-variant-numeric: tabular-nums; }
+    #error { padding: 16px; border: 1px solid #a62525; margin-top: 16px; }
+    #error p { color: #8d2020; }
+    .file-table { width: 100%; border-collapse: collapse; table-layout: auto; font-size: .875rem; line-height: 1.55; }
+    .file-table caption { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    .file-table th { text-align: left; background: #e0e5ea; padding: 10px 12px; font-weight: 600; border-block: 1px solid var(--line); }
+    .file-table td { padding: 6px 12px; vertical-align: top; border-bottom: 1px solid #dce1e6; }
+    .file-table .detail-cell { position: relative; width: 1%; vertical-align: middle; }
+    .file-table td.detail-cell::before { content: "▶ 詳細"; display: block; min-height: 30px; visibility: hidden; white-space: nowrap; }
+    .detail-toggle { position: absolute; inset: 0; width: 100%; height: 100%; min-height: 30px; padding: 4px 0; border: 0; background: transparent; white-space: nowrap; }
+    .detail-toggle::before { content: ""; display: inline-block; margin-right: 6px; border-left: 5px solid currentColor; border-top: 4px solid transparent; border-bottom: 4px solid transparent; }
+    .detail-toggle[aria-expanded="true"]::before { transform: rotate(90deg); }
+    .file-table .name-cell { width: 40%; vertical-align: middle; }
+    .file-table .comment-cell { width: auto; vertical-align: middle; }
+    .file-table .size-cell { width: 9%; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .file-table .date-cell { width: 1%; text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .file-table .action-cell { width: 1%; text-align: center; white-space: nowrap; }
+    .file:nth-child(even) { background: #e9edf1; }
+    .file:hover, .file:focus-within { background: #e3edf7; }
+    .file h3 { margin: 0; font-size: .925rem; font-weight: 600; overflow-wrap: anywhere; }
+    /* 青を起点に色相を72°ずつ離した、低彩度のペンタード配色。 */
+    .server-tag { display: inline-block; margin-right: 6px; padding: 1px 6px; border: 1px solid hsl(var(--tag-hue) 30% 64%); border-radius: 3px; background: hsl(var(--tag-hue) 40% 86%); color: hsl(var(--tag-hue) 45% 24%); font-size: .75rem; font-weight: 600; vertical-align: middle; white-space: nowrap; }
+    .server-tag[data-server="DCSJP1"] { --tag-hue: 212; }
+    .server-tag[data-server="DCSJP2"] { --tag-hue: 284; }
+    .server-tag[data-server="DCSJP3"] { --tag-hue: 356; }
+    .server-tag[data-server="DCSJP4"] { --tag-hue: 68; }
+    .server-tag[data-server="SU25T"] { --tag-hue: 140; }
+    .comment { display: -webkit-box; -webkit-box-orient: vertical; line-clamp: 3; -webkit-line-clamp: 3; overflow: hidden; white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; }
+    .modified { display: inline-block; margin-top: 4px; color: var(--muted); font-size: .8rem; }
+    .download { display: inline-flex; align-items: center; justify-content: center; min-height: 36px; padding: 6px 10px; border: 1px solid var(--link); border-radius: 3px; background: var(--paper); text-decoration: none; white-space: nowrap; }
+    .download:hover { background: #ddeafa; }
+    summary { width: fit-content; min-height: 30px; padding: 4px 0; }
+    .file details[open] { padding-bottom: 4px; }
+    .file details[open] summary { margin-bottom: 6px; }
+    .mobile-label { display: none; }
+    dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 16px; margin: 4px 0; font-size: .9rem; }
+    dt { color: var(--muted); }
+    dd { margin: 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+    .document { padding-top: 0; }
+    details.document { padding: 0; }
+    .document > summary { width: 100%; padding: 12px 0; min-height: 44px; color: var(--ink); font-weight: 600; }
+    .document > summary h2 { display: inline; font-size: 1rem; margin: 0; }
+    #about summary h3 { display: inline; margin: 0; }
+    #about table { width: calc(100% - 32px); margin-inline: 16px; border-collapse: collapse; font-size: .9rem; }
+    #about th, #about td { padding: 8px 12px; border: 1px solid var(--line); text-align: left; overflow-wrap: anywhere; }
+    #about thead { background: var(--surface); }
+    details.document > .prose { padding-bottom: 12px; }
+    #contact h2 { font-size: 1rem; }
+    .prose { display: grid; gap: 12px; overflow-wrap: anywhere; }
+    .prose > * { margin: 0; }
+    .prose > ul { padding-left: 24px; }
+    blockquote { display: grid; gap: 12px; margin: 0; padding: 12px; border-left: 3px solid #8a97a4; background: #dce2e8; }
+    blockquote > p { margin: 0; }
+    .notice { padding: 12px; border: 1px solid #a4afba; border-radius: 2px; background: #e3e8ed; margin: 12px 0; }
+    .warning { padding: 16px; border-left: 4px solid #967332; background: #eee3c8; color: #594521; }
+    .empty { padding: 12px 0; }
+    .skip { position: absolute; left: 16px; top: -100px; background: var(--paper); padding: 12px; z-index: 1; }
+    .skip:focus { top: 8px; }
+    [hidden] { display: none !important; }
+    @media (max-width: 900px) {
+      main { gap: 24px; padding: 24px 16px 32px; }
+      body > footer { padding: 24px 16px 32px; }
+      .toolbar { grid-template-columns: 1fr; gap: 8px; }
+      select { width: 100%; }
+      header nav { gap: 8px 16px; }
+      .file-table, .file-table tbody { display: block; }
+      .file-table thead { display: none; }
+      .file-table .file { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; padding: 6px 0; border-bottom: 1px solid var(--line); }
+      .file-table td { display: block; width: auto !important; padding: 0; border: 0; }
+      .file-table .detail-cell { grid-column: 1; grid-row: 1; }
+      .file-table .name-cell { grid-column: 2; grid-row: 1; }
+      .file-table .comment-cell { grid-column: 1 / -1; }
+      .file-table .size-cell { grid-column: 1; text-align: left; align-self: end; }
+      .file-table .date-cell { grid-column: 1; text-align: left; color: var(--muted); font-size: .8rem; }
+      .file-table .action-cell { grid-column: 2; grid-row: 3 / 5; align-self: center; }
+      .file-table .comment { line-clamp: 2; -webkit-line-clamp: 2; }
+      .detail-toggle, .download { min-height: 44px; }
+      .mobile-label { display: inline; }
+      .file-table .file:nth-child(even) { background: transparent; }
+      .file-table .file:hover { background: transparent; }
+      dl { grid-template-columns: 1fr; gap: 2px; }
+      dd { margin-bottom: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#search">ファイル検索へ移動</a>
+  <main>
+    <header>
+      <h1>DCS World 日本語化ファイルアーカイブ</h1>
+      <p class="muted">旧アップローダーの保存ファイルを検索・ダウンロードできます。</p>
+    </header>
+
+    <section id="about" class="document" aria-labelledby="about-title">
+      <h2 id="about-title">このアーカイブについて</h2>
+      <div class="prose">
+        <p class="notice">本プロジェクトは、<strong>非公式の有志コミュニティによるアーカイブ活動</strong>です。DCS World の公式プロジェクトではありません。また、DCS World 日本語化ファイルアップローダーとは独立して運営しています。</p>
+        <p class="warning"><strong>保存されているファイルや翻訳内容は古くなっている可能性があります。</strong><br>現在の DCS World では正常に動作しない場合があるほか、翻訳内容も現在の仕様や原文と一致しない場合があります。利用前に、各ファイルの投稿日時や対応バージョンをご確認ください。</p>
+        <p>uploader.jp の閉鎖に伴い、DCS World 日本語化ファイルアップローダー（旧アップローダー）に投稿されたすべてのファイルをバックアップし、保存するために発足したプロジェクトです。</p>
+        <p>uploader.jp の閉鎖後は、速やかに GitHub のアーカイブ機能で本リポジトリを読み取り専用にします。</p>
+        <p>本プロジェクトは、旧アップローダーの管理者から許可を得たうえで、投稿ファイルのアーカイブ化を行っています。</p>
+        <p>本プロジェクトでは、新規投稿や修正ファイルの再アップロードは受け付けません。</p>
+        <details>
+          <summary><h3>旧アップローダー</h3></summary>
+          <table>
+            <thead>
+              <tr><th scope="col">アップローダー</th><th scope="col">旧URL</th></tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">DCSJP1</th><td>https://uu.getuploader.com/DCSJP1/</td></tr>
+              <tr><th scope="row">DCSJP2</th><td>https://ux.getuploader.com/DCSJP2/</td></tr>
+              <tr><th scope="row">DCSJP3</th><td>https://ux.getuploader.com/DCSJP3/</td></tr>
+              <tr><th scope="row">DCSJP4</th><td>https://ux.getuploader.com/DCSJP4/</td></tr>
+              <tr><th scope="row">SU25T</th><td>https://ux.getuploader.com/SU25T/</td></tr>
+            </tbody>
+          </table>
+        </details>
+      </div>
+    </section>
+
+    <section id="terms" class="document" aria-labelledby="terms-title">
+      <h2 id="terms-title">ファイルの利用条件</h2>
+      <div class="prose">
+        <p>本プロジェクトが旧アップローダー管理者から受けているアーカイブ化の許可は、各ファイルの著作権の譲渡や、利用条件の変更を意味するものではありません。</p>
+        <p>本リポジトリのファイルは、以下の旧アップローダーの利用規約に準拠して利用してください。</p>
+        <h3>旧アップローダーの利用規約</h3>
+        <!-- TODO: 2026年11月25日（uploader.jp 閉鎖日）に変更する -->
+        <p>以下は、2026年10月24日時点の旧アップローダーの利用規約です。</p>
+        <p class="notice">本プロジェクトでアーカイブするファイルについての連絡窓口は<a href="#contact">問い合わせ・報告先</a>に一本化しています。引用内のスレッドや連絡先は当時の記録であり、現在の窓口ではありません。</p>
+        <p>文中の「ここ」「このアプロダ」や、投稿・再アップロード・削除に関する記述は、旧アップローダーを指します。「管理人」は旧アップローダーの管理人を指し、本リポジトリの管理者とは区別します。</p>
+        <blockquote>
+          <p>このアプロダは非営利で運営しています。<br>ここで公開するファイルの著作権は元ファイルの制作者が所有しています。<br>元ファイルの制作者の利益を損なうようなものはアップロードしないでください。<br>（原則ミッションファイルそのもの「○○○.miz」のアップロードは禁止します）<br>ここアップされているファイルは自己責任において使用してください</p>
+          <p>日本語化手順については下記URLから自動翻訳プログラムダウンロードしてください。<br>https://uu.getuploader.com/DCSJP1/download/220<br>手動でやる場合はこちらをダウンロードしてください。<br>https://uu.getuploader.com/DCSJP1/download/111</p>
+          <p>ここにアップされているファイルについて元の制作者は関係ありませんんで、問合せをしないでください。<br>問い合わせは、５チャンネルのDCS日本語化フォーラムの方にお願いします。<br>https://medaka.5ch.net/test/read.cgi/fly/1638083756/<br>ここにアップされているファイルの転載は禁止します。（バージョン違いが拡散することを防ぐため）</p>
+          <p>ここにアップされているファイルを修正して、ここに再アップすることを許可します。<br>（製作者がいつまでの管理できるわけではありませんので、このようなルールにしておきます。）</p>
+          <p>アップには削除キーをつけてください。削除キーをつけ忘れたファイルを削除する場合は管理人までご連絡ください。<br>100M上限なので注意してください。</p>
+        </blockquote>
+      </div>
+    </section>
+
+    <section id="files" aria-labelledby="files-title">
+      <h2 id="files-title">ファイルを探す</h2>
+      <div class="toolbar">
+        <div>
+          <label for="search">ファイル名・投稿コメントで検索</label>
+          <div class="search-row">
+            <input id="search" type="search" placeholder="例：Su-25T マニュアル" aria-describedby="search-hint" disabled>
+            <button id="clear" type="button" disabled>クリア</button>
+          </div>
+          <p id="search-hint" class="hint">スペース区切りで AND 検索。全角・半角、大文字・小文字は区別しません。</p>
+        </div>
+        <div>
+          <label for="sort">並べ替え</label>
+          <select id="sort" disabled>
+            <option value="newest">投稿日時が新しい順</option>
+            <option value="oldest">投稿日時が古い順</option>
+            <option value="name">名前順</option>
+            <option value="largest">容量が大きい順</option>
+            <option value="smallest">容量が小さい順</option>
+          </select>
+        </div>
+      </div>
+      <div class="result-bar">
+        <p id="status" role="status" aria-live="polite" aria-atomic="true">ファイル一覧を読み込んでいます…</p>
+        <a href="#terms">ダウンロード前に利用条件をご確認ください</a>
+      </div>
+      <noscript><p class="notice">一覧の検索・表示には JavaScript が必要です。<a href="files.jsonc">ファイル一覧データ</a>は直接閲覧できます。</p></noscript>
+      <div id="error" role="alert" hidden>
+        <p id="error-message"></p>
+        <button id="retry" type="button">再読み込み</button>
+      </div>
+      <div id="results" aria-busy="true"></div>
+    </section>
+
+  </main>
+  <footer aria-labelledby="contact-title">
+    <section id="contact" class="document" aria-labelledby="contact-title">
+      <h2 id="contact-title">問い合わせ・報告先</h2>
+      <div class="prose">
+        <p>本プロジェクトや保存ファイルに関する問い合わせ・報告・削除要請は、本リポジトリの GitHub オーナーの以下のメールアドレスへご連絡ください。DCS World の開発元や旧アップローダーの管理者への問い合わせはお控えください。</p>
+        <p><code>dcs.translation.japanese+uploader-archive[at]gmail.com</code></p>
+        <p>送信時は <code>[at]</code> を <code>@</code> に置き換えてください。</p>
+        <nav aria-label="関連リンク">
+          <a href="https://github.com/dcs-translation-japanese/uploader-archive">GitHubリポジトリ</a>
+          <a href="#terms">利用条件</a>
+        </nav>
+        <p>アーカイブ取得日：<time datetime="2026-10-24">2026年10月24日</time></p>
+      </div>
+    </section>
+  </footer>
+  <script>
+    "use strict";
+    // 標準の GitHub Pages では自動判定。独自ドメインの場合は https://github.com/OWNER/REPO を指定。
+    const REPOSITORY_URL = "";
+    // HEAD はリポジトリのデフォルトブランチを指す。
+    const DOWNLOAD_REF = "HEAD";
+    const search = document.querySelector("#search");
+    const sort = document.querySelector("#sort");
+    const clear = document.querySelector("#clear");
+    const results = document.querySelector("#results");
+    const status = document.querySelector("#status");
+    const error = document.querySelector("#error");
+    let files = [];
+    const collator = new Intl.Collator("ja", { numeric: true, sensitivity: "base" });
+    const dateFormat = new Intl.DateTimeFormat("ja-JP", { timeZone: "Asia/Tokyo", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false });
+
+    // 文字列内の URL や // を壊さずにコメントと末尾カンマを除去する。eval は使用しない。
+    function parseJsonc(source) {
+      let clean = "", inString = false, escaped = false;
+      source = source.replace(/^\uFEFF/, "");
+      for (let i = 0; i < source.length; i++) {
+        const c = source[i];
+        if (inString) {
+          clean += c;
+          if (escaped) escaped = false;
+          else if (c === "\\") escaped = true;
+          else if (c === '"') inString = false;
+        } else if (c === '"') { inString = true; clean += c; }
+        else if (c === "/" && source[i + 1] === "/") {
+          clean += " ";
+          while (i + 1 < source.length && !/[\r\n]/.test(source[i + 1])) i++;
+        } else if (c === "/" && source[i + 1] === "*") {
+          const end = source.indexOf("*/", i + 2);
+          if (end < 0) throw new Error("コメントが閉じられていません。");
+          clean += " "; i = end + 1;
+        } else clean += c;
+      }
+      let json = "";
+      inString = false; escaped = false;
+      for (let i = 0; i < clean.length; i++) {
+        const c = clean[i];
+        if (!inString && c === "," && /^\s*[}\]]/.test(clean.slice(i + 1))) continue;
+        json += c;
+        if (escaped) escaped = false;
+        else if (inString && c === "\\") escaped = true;
+        else if (c === '"') inString = !inString;
+      }
+      return JSON.parse(json);
+    }
+
+    function repositoryUrl() {
+      if (REPOSITORY_URL) {
+        if (!/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/?$/.test(REPOSITORY_URL)) throw new Error("リポジトリURLの設定を確認してください。");
+        return REPOSITORY_URL.replace(/\/$/, "");
+      }
+      const match = location.hostname.match(/^([\w-]+)\.github\.io$/i);
+      if (!match) return null;
+      const repo = location.pathname.split("/").filter(Boolean)[0];
+      return `https://github.com/${match[1]}/${repo && repo !== "index.html" ? repo : location.hostname}`;
+    }
+
+    function downloadUrl(path) {
+      const encoded = path.split("/").map(encodeURIComponent).join("/");
+      const repo = repositoryUrl();
+      // Git LFS のポインターではなく実ファイルを取得する。
+      if (repo) return `${repo.replace("https://github.com/", "https://media.githubusercontent.com/media/")}/${encodeURIComponent(DOWNLOAD_REF)}/${encoded}`;
+      if (["localhost", "127.0.0.1", "[::1]"].includes(location.hostname)) return new URL(`../${encoded}`, location.href).href;
+      throw new Error("公開先に対応するリポジトリURLを設定してください。");
+    }
+
+    function validateData(data) {
+      if (!data || data.schema_version !== 1 || !Array.isArray(data.files)) throw new Error("一覧データの形式に対応していません。");
+      for (const file of data.files) {
+        if (!file || ["path", "display_name", "original_filename", "comment"].some(key => typeof file[key] !== "string") ||
+          !/^files\/.+/.test(file.path) || file.path.split("/").some(part => !part || part === "." || part === "..") || /[\\\u0000-\u001f]/.test(file.path) ||
+          !Number.isSafeInteger(file.size) || file.size < 0 || typeof file.modified !== "boolean" ||
+          !(file.uploaded_at === null || (Number.isSafeInteger(file.uploaded_at) && !isNaN(new Date(file.uploaded_at * 1000).valueOf()))) ||
+          !(file.original_url === null || (typeof file.original_url === "string" && /^https?:\/\//i.test(file.original_url) && URL.canParse(file.original_url))) ||
+          !(file.modified_reason === null || typeof file.modified_reason === "string")) throw new Error("一覧データに不正な項目があります。");
+      }
+      return data.files;
+    }
+
+    function normalize(value) { return value.normalize("NFKC").toLocaleLowerCase("ja"); }
+    function formatSize(bytes) {
+      if (bytes < 1024) return `${bytes} B`;
+      const units = ["KiB", "MiB", "GiB", "TiB"];
+      let value = bytes / 1024, unit = 0;
+      while (value >= 1024 && unit < units.length - 1) { value /= 1024; unit++; }
+      return `${value.toLocaleString("ja-JP", { maximumFractionDigits: 1 })} ${units[unit]}`;
+    }
+    function element(tag, className, text) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text !== undefined) node.textContent = text;
+      return node;
+    }
+    function addDetail(dl, label, value) {
+      dl.append(element("dt", "", label));
+      const dd = element("dd");
+      dd.append(typeof value === "string" ? document.createTextNode(value) : value);
+      dl.append(dd);
+    }
+    function fileElement(file) {
+      const article = element("tr", "file");
+      const body = element("td", "name-cell");
+      const name = element("h3");
+      const server = file.path.split("/")[1];
+      const tag = element("span", "server-tag", server);
+      tag.dataset.server = server;
+      name.append(tag, document.createTextNode(file.display_name));
+      body.append(name);
+      if (file.modified) body.append(element("span", "modified", "変更あり"));
+      const comment = element("td", "comment-cell");
+      comment.append(element("p", "comment", file.comment || "—"));
+      const size = element("td", "size-cell", formatSize(file.size));
+      size.title = `${file.size.toLocaleString("ja-JP")} バイト`;
+      const date = element("td", "date-cell");
+      date.append(element("span", "mobile-label", "投稿："));
+      if (file.uploaded_at === null) date.append(element("span", "", "投稿日時不明"));
+      else {
+        const fullDate = dateFormat.format(file.uploaded_at * 1000);
+        const time = element("time", "", fullDate.split(" ")[0]);
+        time.title = `${fullDate} JST`;
+        time.dateTime = new Date(file.uploaded_at * 1000).toISOString();
+        date.append(time);
+      }
+      const details = element("div", "file-details");
+      details.id = `file-details-${encodeURIComponent(file.path)}`;
+      details.hidden = true;
+      const dl = element("dl");
+      addDetail(dl, "元のファイル名", file.original_filename);
+      addDetail(dl, "投稿コメント", file.comment || "なし");
+      addDetail(dl, "投稿日時", file.uploaded_at === null ? "不明" : `${dateFormat.format(file.uploaded_at * 1000)} JST`);
+      addDetail(dl, "容量", `${file.size.toLocaleString("ja-JP")} バイト`);
+      addDetail(dl, "変更の有無", file.modified ? "変更あり" : "変更なし");
+      if (file.modified) addDetail(dl, "変更理由", file.modified_reason || "不明");
+      if (file.original_url) {
+        const link = element("a", "", file.original_url);
+        link.href = file.original_url;
+        addDetail(dl, "旧アップローダー", link);
+      } else addDetail(dl, "旧アップローダー", "URL不明");
+      details.append(dl);
+      body.append(details);
+      const detailCell = element("td", "detail-cell");
+      const detailToggle = element("button", "detail-toggle", "詳細");
+      detailToggle.type = "button";
+      detailToggle.setAttribute("aria-label", `${file.display_name} の詳細`);
+      detailToggle.setAttribute("aria-controls", details.id);
+      detailToggle.setAttribute("aria-expanded", "false");
+      detailToggle.addEventListener("click", () => {
+        details.hidden = !details.hidden;
+        detailToggle.setAttribute("aria-expanded", String(!details.hidden));
+      });
+      detailCell.append(detailToggle);
+      const download = element("a", "download", "ダウンロード");
+      download.href = downloadUrl(file.path);
+      download.download = file.display_name;
+      download.setAttribute("aria-label", `${file.display_name} をダウンロード`);
+      download.addEventListener("click", async event => {
+        event.preventDefault();
+        if (download.getAttribute("aria-busy") === "true") return;
+        download.setAttribute("aria-busy", "true");
+        download.textContent = "取得中…";
+        try {
+          // 別オリジンでは download 属性が無視されるため、Blob URL から保存する。
+          const response = await fetch(download.href);
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const blobUrl = URL.createObjectURL(await response.blob());
+          const save = element("a");
+          save.href = blobUrl;
+          save.download = file.display_name;
+          document.body.append(save);
+          save.click();
+          save.remove();
+          // ブラウザーが保存を開始するまで URL を保持する。
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+        } catch (cause) {
+          window.alert(`ダウンロードに失敗しました。通信環境を確認して再度お試しください。（${cause.message}）`);
+        } finally {
+          download.removeAttribute("aria-busy");
+          download.textContent = "ダウンロード";
+        }
+      });
+      const action = element("td", "action-cell");
+      action.append(download);
+      article.append(detailCell, body, comment, size, date, action);
+      return article;
+    }
+
+    function render() {
+      const words = normalize(search.value).trim().split(/\s+/).filter(Boolean);
+      const filtered = files.filter(file => words.every(word => file.searchText.includes(word)));
+      filtered.sort((a, b) => {
+        if (sort.value === "name") return collator.compare(a.display_name, b.display_name);
+        if (sort.value === "largest") return b.size - a.size;
+        if (sort.value === "smallest") return a.size - b.size;
+        if (a.uploaded_at === null) return b.uploaded_at === null ? 0 : 1;
+        if (b.uploaded_at === null) return -1;
+        return sort.value === "oldest" ? a.uploaded_at - b.uploaded_at : b.uploaded_at - a.uploaded_at;
+      });
+      const fragment = document.createDocumentFragment();
+      if (filtered.length) {
+        const table = element("table", "file-table");
+        table.append(element("caption", "", "保存ファイル一覧"));
+        const head = element("thead");
+        const row = element("tr");
+        for (const [className, text] of [["detail-cell", "詳細"], ["name-cell", "ファイル名"], ["comment-cell", "投稿コメント"], ["size-cell", "容量"], ["date-cell", "投稿日時（JST）"], ["action-cell", "ダウンロード"]]) {
+          const th = element("th", className, text);
+          th.scope = "col";
+          row.append(th);
+        }
+        head.append(row);
+        const body = element("tbody");
+        for (const file of filtered) body.append(fileElement(file));
+        table.append(head, body);
+        fragment.append(table);
+      }
+      if (!filtered.length) fragment.append(element("p", "empty", files.length ? "一致するファイルはありません。検索語を減らすか、別の語でお試しください。" : "保存ファイルはまだ登録されていません。"));
+      results.replaceChildren(fragment);
+      status.textContent = `${files.length.toLocaleString("ja-JP")} 件中 ${filtered.length.toLocaleString("ja-JP")} 件を表示`;
+      clear.disabled = !search.value;
+    }
+
+    async function load() {
+      error.hidden = true;
+      results.setAttribute("aria-busy", "true");
+      status.textContent = "ファイル一覧を読み込んでいます…";
+      document.querySelector("#retry").disabled = true;
+      try {
+        if (location.protocol === "file:") throw new Error("ローカル確認時は HTTP サーバー経由で開いてください。");
+        const response = await fetch("./files.jsonc", { cache: "no-cache", signal: AbortSignal.timeout(15000) });
+        if (!response.ok) throw new Error(`一覧データを取得できませんでした（HTTP ${response.status}）。`);
+        files = validateData(parseJsonc(await response.text())).map(file => ({ ...file, searchText: normalize(`${file.display_name}\n${file.original_filename}\n${file.comment}`) }));
+        render();
+        search.disabled = false; sort.disabled = false;
+      } catch (cause) {
+        results.replaceChildren();
+        search.disabled = true; sort.disabled = true; clear.disabled = true;
+        status.textContent = "ファイル一覧を表示できません。";
+        document.querySelector("#error-message").textContent = `読み込みに失敗しました。${cause.message} 通信環境を確認して再読み込みしてください。`;
+        error.hidden = false;
+      } finally {
+        results.setAttribute("aria-busy", "false");
+        document.querySelector("#retry").disabled = false;
+      }
+    }
+    search.addEventListener("input", render);
+    sort.addEventListener("change", render);
+    clear.addEventListener("click", () => { search.value = ""; render(); search.focus(); });
+    document.querySelector("#retry").addEventListener("click", load);
+    function revealSection() {
+      const target = document.getElementById(location.hash.slice(1));
+      if (target instanceof HTMLDetailsElement) target.open = true;
+    }
+    window.addEventListener("hashchange", revealSection);
+    // 同じアンカーを再度クリックした場合にも開く。
+    document.querySelectorAll('a[href^="#"]').forEach(link => link.addEventListener("click", () => {
+      const target = document.getElementById(link.getAttribute("href").slice(1));
+      if (target instanceof HTMLDetailsElement) target.open = true;
+    }));
+    revealSection();
+    load();
+  </script>
+</body>
+</html>

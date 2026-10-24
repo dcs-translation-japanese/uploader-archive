@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "files": [
+
+    // {
+    //   "path": "保存ファイルのパス（リポジトリルート基準）",
+    //   "display_name": "表示ファイル名",
+    //   "original_filename": "オリジナルファイル名",
+    //   "comment": "旧アップロードコメント",
+    //   "size": ファイル容量（バイト単位）,
+    //   "uploaded_at": アップロード日時（UNIX時間、秒単位。不明はnull）,
+    //   "original_url": "旧アップローダーのURL（不明はnull）",
+    //   "modified": オリジナルから変更されているか（boolean）,
+    //   "modified_reason": "変更理由（変更なし・理由不明の場合はnull）"
+    // },
+  ]
+}
