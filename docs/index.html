@@ -196,6 +196,8 @@
             <option value="newest">投稿日時が新しい順</option>
             <option value="oldest">投稿日時が古い順</option>
             <option value="name">名前順</option>
+            <option value="server-asc">サーバー昇順</option>
+            <option value="server-desc">サーバー降順</option>
             <option value="largest">容量が大きい順</option>
             <option value="smallest">容量が小さい順</option>
           </select>
@@ -429,6 +431,10 @@
       const filtered = files.filter(file => words.every(word => file.searchText.includes(word)));
       filtered.sort((a, b) => {
         if (sort.value === "name") return collator.compare(a.display_name, b.display_name);
+        if (sort.value === "server-asc" || sort.value === "server-desc") {
+          const order = collator.compare(a.path.split("/")[1], b.path.split("/")[1]);
+          return sort.value === "server-desc" ? -order : order;
+        }
         if (sort.value === "largest") return b.size - a.size;
         if (sort.value === "smallest") return a.size - b.size;
         if (a.uploaded_at === null) return b.uploaded_at === null ? 0 : 1;
