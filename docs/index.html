@@ -290,11 +290,14 @@
       return `https://github.com/${match[1]}/${repo && repo !== "index.html" ? repo : location.hostname}`;
     }
 
-    function downloadUrl(path) {
+    function downloadUrl(path, useRaw = false) {
       const encoded = path.split("/").map(encodeURIComponent).join("/");
       const repo = repositoryUrl();
-      // Git LFS のポインターではなく実ファイルを取得する。
-      if (repo) return `${repo.replace("https://github.com/", "https://media.githubusercontent.com/media/")}/${encodeURIComponent(DOWNLOAD_REF)}/${encoded}`;
+      // LFS は media、通常の Git ファイルは raw から実ファイルを取得する。
+      if (repo) {
+        const base = useRaw ? "https://raw.githubusercontent.com/" : "https://media.githubusercontent.com/media/";
+        return `${repo.replace("https://github.com/", base)}/${encodeURIComponent(DOWNLOAD_REF)}/${encoded}`;
+      }
       if (["localhost", "127.0.0.1", "[::1]"].includes(location.hostname)) return new URL(`../${encoded}`, location.href).href;
       throw new Error("公開先に対応するリポジトリURLを設定してください。");
     }
@@ -395,7 +398,9 @@
         download.textContent = "取得中…";
         try {
           // 別オリジンでは download 属性が無視されるため、Blob URL から保存する。
-          const response = await fetch(download.href);
+          let response = await fetch(download.href);
+          // media は非LFSファイルに 404 を返すため、通常ファイル用の URL で再取得する。
+          if (response.status === 404 && repositoryUrl()) response = await fetch(downloadUrl(file.path, true));
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
           const blobUrl = URL.createObjectURL(await response.blob());
           const save = element("a");
