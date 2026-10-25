@@ -11,6 +11,8 @@ uploader.jp の閉鎖後は、速やかに GitHub のアーカイブ機能で本
 
 本プロジェクトでは、新規投稿や修正ファイルの再アップロードは受け付けません。
 
+保存ファイルの閲覧・ダウンロードは、[アーカイブサイト](https://dcs-translation-japanese.github.io/uploader-archive/)から行えます。
+
 ## 旧アップローダー
 
 | アップローダー | URL |
